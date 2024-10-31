@@ -61,6 +61,8 @@ class Cewler:
         parser.add_argument("-u", "--user-agent", default=constants.DEFAULT_USER_AGENT, help=f"User-Agent header to send (default: {constants.DEFAULT_USER_AGENT})")
         parser.add_argument("-v", "--verbose", action="store_true", help="A bit more detailed output")
         parser.add_argument("-w", "--without-numbers", action="store_true", help="ignore words are numbers or contain numbers")
+        parser.add_argument("-fs", "--filter-special-characters", action="store_true", help="ignore words with special characters")
+
 
         args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
         if "://" not in args.url:  # Missing scheme in request url - let try to help out the user by prefixing it with http
@@ -128,6 +130,7 @@ class Cewler:
         nice_words += ", " + ("excl." if args.without_numbers else "incl.") + " numbers"
         nice_words += ", incl. JS" if args.include_js else ""
         nice_words += ", incl. CSS" if args.include_css else ""
+        nice_words += ", filter special characters" if args.filter_special_characters else ""
         nice_words += f", min. {args.min_word_length} chars."
         nice_ua = "Default" if constants.DEFAULT_USER_AGENT == args.user_agent else "Custom"
         nice_ua += " (" + textwrap.shorten(args.user_agent, width=40, placeholder="...") + ")"
@@ -235,7 +238,7 @@ class Cewler:
             with self.live:
                 process = CrawlerProcess(self.get_scrapy_settings_and_init_logging(args.user_agent, args.depth, args.rate, args.subdomain_strategy))
                 process.crawl(spider.CewlerSpider, console=self.console, url=args.url, file_words=args.output, file_emails=args.output_emails, file_urls=args.output_urls, include_js=args.include_js, include_css=args.include_css, include_pdf=args.include_pdf,
-                              should_lowercase=args.lowercase, without_numbers=args.without_numbers, min_word_length=args.min_word_length, verbose=args.verbose, stream_to_file=args.stream, spider_event_callback=self.on_spider_event)
+                              should_lowercase=args.lowercase, without_numbers=args.without_numbers, min_word_length=args.min_word_length, verbose=args.verbose, stream_to_file=args.stream, spider_event_callback=self.on_spider_event,filter_special_characters=args.filter_special_characters)
                 process.start()
             print("")
 

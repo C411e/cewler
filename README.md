@@ -64,13 +64,18 @@ It's also possible to store the crawled files to a file.
 It's also possible to store the scraped e-mail addresses to a separate file (they are always added to the wordlist).
 `cewler --output wordlist.txt --output-emails emails.txt https://example.com`  
 
+
+#### Filter Special Characters ([a-zA-Z-_0-9]+)
+No special characters   
+`cewler --output wordlist.txt -fs https://example.com`  
+
 #### Ninja trick 🥷
 If it just takes too long to crawl a site you can press `ctrl + c` once(!) and wait while the spider finishes the current requests and then whatever words have been found so far is stored to the output file.
 
 ### All options
 ```
 cewler -h
-usage: cewler [-h] [-d DEPTH] [-js] [-l] [-m MIN_WORD_LENGTH] [-o OUTPUT] [-ou OUTPUT_URLS] [-r RATE] [-s {all,children,exact}] [--stream] [-u USER_AGENT] [-v] [-w] url
+usage: cewler [-h] [-d DEPTH] [-js] [-l] [-m MIN_WORD_LENGTH] [-o OUTPUT] [-ou OUTPUT_URLS] [-r RATE] [-s {all,children,exact}] [--stream] [-u USER_AGENT] [-v] [-fs] [-w] url
 
 CeWLeR - Custom Word List generator Redefined
 
@@ -101,6 +106,7 @@ options:
   -v, --verbose         A bit more detailed output
   -w, --without-numbers
                         ignore words are numbers or contain numbers
+  -fs, --filter-special-chararcters ignore words with special characters                         
 ```
 
 ### Subdomain strategies

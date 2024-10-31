@@ -57,7 +57,7 @@ class AnyParentAndSisterAndSubdomainMiddleware(offsite.OffsiteMiddleware):
 class CewlerSpider(CrawlSpider):
     name = "CeWLeR"
 
-    def __init__(self, console, url, file_words=None, file_emails=None, file_urls=None, include_js=False, include_css=False, include_pdf=False, should_lowercase=False, without_numbers=False, min_word_length=5, verbose=False, spider_event_callback=None, stream_to_file=False, *args, **kwargs):
+    def __init__(self, console, url, file_words=None, file_emails=None, file_urls=None, include_js=False, include_css=False, include_pdf=False, should_lowercase=False, without_numbers=False, min_word_length=5, verbose=False, spider_event_callback=None, stream_to_file=False, filter_special_characters=False,*args, **kwargs):
         self.console = console
         self.should_lowercase = should_lowercase
         self.without_numbers = without_numbers
@@ -76,6 +76,7 @@ class CewlerSpider(CrawlSpider):
         self.include_js = include_js
         self.include_css = include_css
         self.include_pdf = include_pdf
+        self.filter_special_characters = filter_special_characters
         deny_extensions = scrapy.linkextractors.IGNORED_EXTENSIONS
         if self.include_pdf:
             deny_extensions.remove("pdf")
@@ -202,11 +203,19 @@ class CewlerSpider(CrawlSpider):
                 if not found:
                     break
             if len(word) >= max(1, self.min_word_length):
-                if self.without_numbers:
-                    if not bool(re.search(r'\d', word)):
-                        new_words.append(word)
+                if self.filter_special_characters:
+                    if re.fullmatch("[a-zA-Z-_0-9]+",word):
+                        if self.without_numbers:
+                            if not bool(re.search(r'\d', word)):
+                                new_words.append(word)
+                        else:
+                            new_words.append(word)
                 else:
-                    new_words.append(word)
+                    if self.without_numbers:
+                        if not bool(re.search(r'\d', word)):
+                            new_words.append(word)
+                    else:
+                        new_words.append(word)
         return (set(new_words), set(new_emails))
 
     def _get_words_from_text_response(self, text):
